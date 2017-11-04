@@ -14,5 +14,5 @@ public class StudentModel
     private String npm;
     private String name;
     private double gpa;
-    private List<CourseModel> course;
+    private List<CourseModel> courses;
 }

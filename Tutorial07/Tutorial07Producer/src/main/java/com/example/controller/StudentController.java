@@ -5,11 +5,8 @@ import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
-import org.springframework.validation.BindingResult;
-import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 
 import com.example.model.StudentModel;
@@ -21,20 +18,17 @@ public class StudentController
     @Autowired
     StudentService studentDAO;
 
-
     @RequestMapping("/")
     public String index ()
     {
         return "index";
     }
 
-
     @RequestMapping("/student/add")
     public String add ()
     {
         return "form-add";
     }
-
 
     @RequestMapping("/student/add/submit")
     public String addSubmit (
@@ -44,10 +38,8 @@ public class StudentController
     {
         StudentModel student = new StudentModel (npm, name, gpa, null);
         studentDAO.addStudent (student);
-
         return "success-add";
     }
-
 
     @RequestMapping("/student/view")
     public String view (Model model,
@@ -64,13 +56,12 @@ public class StudentController
         }
     }
 
-
     @RequestMapping("/student/view/{npm}")
     public String viewPath (Model model,
             @PathVariable(value = "npm") String npm)
     {
         StudentModel student = studentDAO.selectStudent (npm);
-
+        System.out.println(student);
         if (student != null) {
             model.addAttribute ("student", student);
             return "view";
@@ -94,35 +85,32 @@ public class StudentController
     @RequestMapping("/student/delete/{npm}")
     public String delete (Model model, @PathVariable(value = "npm") String npm)
     {
-    	StudentModel students = studentDAO.selectStudent(npm);
-    	studentDAO.deleteStudent(npm);
     	
-    	if (studentDAO.selectAllStudents() != null) {
-    		model.addAttribute("student", students);
+    	if(studentDAO.selectStudent(npm) != null){
+    		studentDAO.deleteStudent (npm);
     		return "delete";
-    	} else {
+    	} else{
     		return "not-found";
     	}
+        
     }
     
     @RequestMapping("/student/update/{npm}")
-    public String update (Model model, @PathVariable(value = "npm") String npm)
-    {
-    	StudentModel student = studentDAO.selectStudent (npm);
-    	studentDAO.updateStudent (student);
+    public String update(Model model, @PathVariable(value = "npm") String npm){
+    	if(studentDAO.selectStudent(npm) != null){
+    		model.addAttribute("student", studentDAO.selectStudent(npm));
+    		return "form-update";
+    	} else{
+    		return "not-found";
     	
-        if (student != null) {
-            model.addAttribute ("student", student);
-            return "form-update";
-        } else {
-            return "not-found";
-        }   
+    	}
     }
     
-    @RequestMapping(value = "/student/update/submit", method = RequestMethod.POST)
-    public String updateSubmit (@ModelAttribute StudentModel student)
-    {
+    @RequestMapping("/student/update/submit")
+    public String updateSubmit(StudentModel student){
+    	
     	studentDAO.updateStudent(student);
+    		
     	return "success-update";
     }
 }
